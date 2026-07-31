@@ -153,15 +153,17 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-mai
 table { width: 100%; border-collapse: collapse; min-width: 1000px; text-align: left; }
 thead { position: sticky; top: 0; background: var(--bg-main); z-index: 2; box-shadow: 0 1px 0 var(--border); }
 th {
-  padding: 14px 16px; font-size: 12px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 14px 16px; font-size: 11px; font-weight: 800; color: var(--primary-dark);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  background: var(--primary-light);
+  border-bottom: 2px solid rgba(5,150,105,0.2);
 }
 td {
   padding: 14px 16px; font-size: 13px; color: var(--text-main); font-weight: 500;
   border-bottom: 1px solid var(--border); vertical-align: middle;
 }
 tbody tr { transition: background 0.15s; }
-tbody tr:hover { background: var(--bg-main); }
+tbody tr:hover { background: #F1F5F9; } /* Slightly darker hover for contrast */
 
 .fcode { font-family: monospace; background: var(--bg-main); padding: 4px 8px; border-radius: 6px; color: var(--text-muted); font-size: 12px; font-weight: 600; border: 1px solid var(--border); }
 .status-badge {
@@ -195,23 +197,46 @@ tbody tr:hover { background: var(--bg-main); }
 .td-actions { display: flex; gap: 6px; }
 .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
 .empty-icon { font-size: 32px; margin-bottom: 12px; color: var(--border); }
-.empty-text { font-size: 15px; font-weight: 600; }
+.selector-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 
 /* ── ACTION BUTTONS ── */
 .action-btns { display: flex; gap: 8px; }
 .btn-edit, .btn-del {
-  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(4px);
-  border: 1px solid var(--border);
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
-  color: var(--text-muted);
   transition: all 0.2s;
   display: flex; align-items: center; justify-content: center;
 }
-.btn-edit:hover { background: var(--primary-light); color: var(--primary-dark); border-color: rgba(5,150,105,0.3); transform: translateY(-1px); }
-.btn-del:hover { background: #FEE2E2; color: #B91C1C; border-color: rgba(239,68,68,0.3); transform: translateY(-1px); }
+.btn-edit {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border: 1px solid rgba(5,150,105,0.3);
+}
+.btn-edit:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(5,150,105,0.2);
+}
+
+.btn-del {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+.btn-del:hover {
+  background: #DC2626;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220,38,38,0.2);
+}
 
 /* ── MODALS & GLASSMORPHISM ── */
 .modal-overlay {
