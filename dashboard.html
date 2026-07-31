@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lead CRM — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/dashboard.css"/>
+</head>
+<body>
+
+  <!-- ── TOP NAV ──────────────────────────────────────────────────── -->
+  <header class="topnav">
+    <div class="topnav-left">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+      <div class="brand">
+        <span class="brand-icon">📊</span>
+        <span class="brand-name">Lead <span class="brand-crm">CRM</span></span>
+      </div>
+    </div>
+    <div class="topnav-center">
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('sheet', this)" id="tab-sheet">📋 Master Leads</button>
+        <button class="nav-tab" onclick="switchTab('summary', this)" id="tab-summary">📈 Leads Summary</button>
+        <button class="nav-tab" onclick="switchTab('members', this)" id="tab-members">👥 Members</button>
+      </div>
+    </div>
+    <div class="topnav-right">
+      <div class="status-dot"></div>
+      <span class="status-text">Live</span>
+      <div class="user-badge" title="Logged in">PS</div>
+      <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- ── MAIN LAYOUT ──────────────────────────────────────────────── -->
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+
+        <div class="nav-section-label">QUICK ACTIONS</div>
+
+        <button class="sidebar-btn primary-btn" onclick="openAddLeadPanel()">
+          <span class="sb-icon">➕</span> Add New Lead
+        </button>
+
+        <button class="sidebar-btn" onclick="openSearchPanel()">
+          <span class="sb-icon">🔍</span> Search Number
+        </button>
+
+        <div class="nav-section-label" style="margin-top:20px;">FILTERS</div>
+
+        <div class="filter-group">
+          <label>Member</label>
+          <select id="memberFilter" onchange="applyMemberFilter()">
+            <option value="">All Members</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Status</label>
+          <select id="statusFilter" onchange="applyStatusFilter()">
+            <option value="">All Status</option>
+            <option>New</option>
+            <option>Contacted</option>
+            <option>Interested</option>
+            <option>Converted</option>
+            <option>No Answer</option>
+            <option>Not Interested</option>
+            <option>Follow-up</option>
+            <option>Second Call Pending</option>
+            <option>Off</option>
+            <option>Invalid</option>
+            <option>Wrong number</option>
+            <option>Busy</option>
+            <option>Call Another Number</option>
+          </select>
+        </div>
+
+        <div class="nav-section-label" style="margin-top:20px;">TOOLS</div>
+
+        <button class="sidebar-btn" onclick="refreshSheet()">
+          <span class="sb-icon">🔄</span> Refresh Sheet
+        </button>
+
+        <button class="sidebar-btn" onclick="openCallLogPanel()">
+          <span class="sb-icon">📞</span> Log a Call
+        </button>
+
+        <!-- LIVE STATS -->
+        <div class="stats-card" id="statsCard">
+          <div class="stats-title">📊 Today's Stats</div>
+          <div class="stats-loading">Loading...</div>
+        </div>
+
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+      <!-- SHEET IFRAME WRAPPER -->
+      <div class="sheet-container" id="sheetContainer">
+        <div class="sheet-toolbar">
+          <span class="sheet-label" id="sheetLabel">📋 Master Leads</span>
+          <a class="open-in-sheets" href="https://docs.google.com/spreadsheets/d/10ZKNM3tEtCTcXSYLZPFBhkrZQ7qR1XXkl84b7j0Ss_Q/edit" target="_blank">
+            🔗 Open in Google Sheets
+          </a>
+        </div>
+        <iframe
+          id="sheetFrame"
+          src="https://docs.google.com/spreadsheets/d/10ZKNM3tEtCTcXSYLZPFBhkrZQ7qR1XXkl84b7j0Ss_Q/edit?usp=sharing&rm=minimal"
+          frameborder="0"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── SLIDE-IN PANELS ─────────────────────────────────────────── -->
+
+  <!-- ADD LEAD PANEL -->
+  <div class="panel-overlay" id="addLeadOverlay" onclick="closePanel('addLead')"></div>
+  <div class="slide-panel" id="addLeadPanel">
+    <div class="panel-header">
+      <h3>➕ Add New Lead</h3>
+      <button class="panel-close" onclick="closePanel('addLead')">✕</button>
+    </div>
+    <div class="panel-body">
+      <p class="panel-note">💡 Use the Google Sheet to add a lead directly, or use this quick-add form below (coming soon with full CRUD integration).</p>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="addPhone" placeholder="e.g. 0771234567"/>
+      </div>
+      <div class="form-group">
+        <label>Assigned Member</label>
+        <select id="addMember">
+          <option value="">Select member...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Grade</label>
+        <input type="text" id="addGrade" placeholder="e.g. 8 or 7,8"/>
+      </div>
+      <div class="form-group">
+        <label>Campaign / Boost</label>
+        <input type="text" id="addCampaign" placeholder="e.g. S26"/>
+      </div>
+      <div class="form-group">
+        <label>Initial Status</label>
+        <select id="addStatus">
+          <option>New</option>
+          <option>Contacted</option>
+          <option>No Answer</option>
+          <option>Interested</option>
+        </select>
+      </div>
+      <button class="btn-submit" onclick="submitAddLead()">Add Lead to Sheet</button>
+      <div id="addLeadResult" class="result-msg" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH PANEL -->
+  <div class="panel-overlay" id="searchOverlay" onclick="closePanel('search')"></div>
+  <div class="slide-panel" id="searchPanel">
+    <div class="panel-header">
+      <h3>🔍 Search a Number</h3>
+      <button class="panel-close" onclick="closePanel('search')">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="searchPhone" placeholder="e.g. 0771234567" oninput="searchNumber()"/>
+      </div>
+      <div id="searchResult" class="search-result-area">
+        <div class="search-placeholder">Type a number above to search...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALL LOG PANEL -->
+  <div class="panel-overlay" id="callLogOverlay" onclick="closePanel('callLog')"></div>
+  <div class="slide-panel" id="callLogPanel">
+    <div class="panel-header">
+      <h3>📞 Log a Call</h3>
+      <button class="panel-close" onclick="closePanel('callLog')">✕</button>
+    </div>
+    <div class="panel-body">
+      <p class="panel-note">📌 Log a call manually. This records the time automatically.</p>
+      <div class="form-group">
+        <label>F-Code</label>
+        <input type="text" id="callFCode" placeholder="e.g. F01025"/>
+      </div>
+      <div class="form-group">
+        <label>Call Result</label>
+        <select id="callResult">
+          <option>Contacted</option>
+          <option>No Answer</option>
+          <option>Busy</option>
+          <option>Wrong number</option>
+          <option>Off</option>
+          <option>Interested</option>
+          <option>Not Interested</option>
+          <option>Converted</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Duration (minutes)</label>
+        <input type="number" id="callDuration" placeholder="e.g. 3" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="callNotes" placeholder="Any important details from the call..."></textarea>
+      </div>
+      <button class="btn-submit" onclick="submitCallLog()">Save Call Log</button>
+      <div id="callLogResult" class="result-msg" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script src="scripts/dashboard.js"></script>
+</body>
+</html>
