@@ -33,6 +33,20 @@ function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("collapsed");
 }
 
+// ── Top Nav Search ─────────────────────────────────────────────────────────────
+function handleTopSearch(e) {
+  if (e.key === "Enter") {
+    triggerTopSearch();
+  }
+}
+
+function triggerTopSearch() {
+  const query = document.getElementById("topSearchInput").value.trim();
+  if (!query) return;
+  // Redirect to My Leads page with search query
+  window.location.href = `my-leads.html?q=${encodeURIComponent(query)}`;
+}
+
 // ── Tab Switching (changes the embedded Google Sheet tab) ─────────────────────
 function switchTab(tabKey, btn) {
   currentTab = tabKey;

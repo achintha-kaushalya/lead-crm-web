@@ -20,10 +20,10 @@
       </div>
     </div>
     <div class="topnav-center">
-      <div class="nav-tabs">
-        <button class="nav-tab active" onclick="switchTab('sheet', this)" id="tab-sheet">📋 Master Leads</button>
-        <button class="nav-tab" onclick="switchTab('summary', this)" id="tab-summary">📈 Leads Summary</button>
-        <button class="nav-tab" onclick="switchTab('members', this)" id="tab-members">👥 Members</button>
+      <div class="top-search-wrapper">
+        <span class="top-search-icon">🔍</span>
+        <input type="text" id="topSearchInput" placeholder="Search Master Leads (any keyword)..." onkeydown="handleTopSearch(event)"/>
+        <button class="btn-top-search" onclick="triggerTopSearch()">Search</button>
       </div>
     </div>
     <div class="topnav-right">
@@ -46,10 +46,6 @@
         <a href="my-leads.html" class="sidebar-btn primary-btn" style="text-decoration:none;">
           <span class="sb-icon">⚡</span> My Leads (CRM Table)
         </a>
-
-        <button class="sidebar-btn" onclick="openSearchPanel()">
-          <span class="sb-icon">🔍</span> Search Number
-        </button>
 
         <div class="nav-section-label" style="margin-top:20px;">TOOLS</div>
 

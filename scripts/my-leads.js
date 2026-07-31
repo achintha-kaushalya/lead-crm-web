@@ -396,4 +396,15 @@ function esc(s) {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", loadMembers);
+document.addEventListener("DOMContentLoaded", async function() {
+  await loadMembers();
+  // Check for search query parameter 'q' in URL
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("q");
+  if (q) {
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.value = q;
+    }
+  }
+});
