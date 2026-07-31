@@ -2,7 +2,7 @@
 //  MY LEADS — Full CRUD (Read, Update, Delete) via Apps Script Web App API
 // ─────────────────────────────────────────────────────────────────────────────
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwem_r1yhevrAy1cDft0b-Fy9DASebc2YVgOtuINjhv48AVSMI11IObeC4nMPGthkg/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZAHEQT6ULvZuXCOeRn62ssHCZEI2iqK2dvVAtwf_rBpD5rBs1IKkt3U-i9gAnQxQ/exec";
 const SESSION_KEY     = "lead_crm_session";
 
 // ── Auth Guard ────────────────────────────────────────────────────────────────
