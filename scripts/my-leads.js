@@ -52,12 +52,11 @@ function populateEditMemberSelect() {
 // ── Load Leads ────────────────────────────────────────────────────────────────
 async function loadLeads() {
   const member = document.getElementById("memberSelect").value;
-  if (!member) return;
-
   setUIState("loading");
 
   try {
-    const url  = `${APPS_SCRIPT_URL}?action=getLeads&member=${encodeURIComponent(member)}`;
+    const memberParam = member ? `&member=${encodeURIComponent(member)}` : "";
+    const url  = `${APPS_SCRIPT_URL}?action=getLeads${memberParam}`;
     const res  = await fetch(url);
     const data = await res.json();
 
@@ -407,4 +406,6 @@ document.addEventListener("DOMContentLoaded", async function() {
       searchInput.value = q;
     }
   }
+  // Auto-load all leads by default
+  await loadLeads();
 });
