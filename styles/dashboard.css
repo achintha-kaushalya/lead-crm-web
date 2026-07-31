@@ -199,12 +199,12 @@
   .sidebar-btn:hover .sb-icon { color: var(--primary); }
   
   /* Raybeam Active State styling */
-  .sidebar-btn.active, .sidebar-btn[href="my-leads.html"] {
+  .sidebar-btn.active {
     background: var(--primary-light);
     color: var(--primary-dark);
     position: relative;
   }
-  .sidebar-btn.active::before, .sidebar-btn[href="my-leads.html"]::before {
+  .sidebar-btn.active::before {
     content: '';
     position: absolute;
     left: -16px; top: 10%; bottom: 10%;
@@ -218,7 +218,7 @@
     color: var(--text-muted);
     transition: color 0.2s;
   }
-  .sidebar-btn.active .sb-icon, .sidebar-btn[href="my-leads.html"] .sb-icon { color: var(--primary); }
+  .sidebar-btn.active .sb-icon { color: var(--primary); }
   
   /* Stats Card */
   .stats-card {
