@@ -49,9 +49,23 @@ function populateEditMemberSelect() {
   });
 }
 
-// ── Load Leads ────────────────────────────────────────────────────────────────
-async function loadLeads() {
+let leadsCache = {};
+
+async function loadLeads(forceRefresh = false) {
   const member = document.getElementById("memberSelect").value;
+  const cacheKey = member || "_ALL_";
+
+  if (!forceRefresh && leadsCache[cacheKey]) {
+    allLeads = leadsCache[cacheKey];
+    activeStatus = "";
+    document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+    document.querySelector(".pill[data-status='']").classList.add("active");
+    applyFilter();
+    updateStats(allLeads);
+    document.getElementById("statsStrip").style.display = "flex";
+    return;
+  }
+
   setUIState("loading");
 
   try {
@@ -60,7 +74,8 @@ async function loadLeads() {
     const res  = await fetch(url);
     const data = await res.json();
 
-    allLeads     = data.leads || [];
+    allLeads = data.leads || [];
+    leadsCache[cacheKey] = allLeads;
     activeStatus = "";
     // reset pills
     document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
