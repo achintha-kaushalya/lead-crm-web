@@ -24,7 +24,6 @@
         <button class="nav-tab active" onclick="switchTab('sheet', this)" id="tab-sheet">📋 Master Leads</button>
         <button class="nav-tab" onclick="switchTab('summary', this)" id="tab-summary">📈 Leads Summary</button>
         <button class="nav-tab" onclick="switchTab('members', this)" id="tab-members">👥 Members</button>
-        <a class="nav-tab my-leads-tab" href="my-leads.html">⚡ My Leads</a>
       </div>
     </div>
     <div class="topnav-right">
@@ -44,9 +43,9 @@
 
         <div class="nav-section-label">QUICK ACTIONS</div>
 
-        <button class="sidebar-btn primary-btn" onclick="openAddLeadPanel()">
-          <span class="sb-icon">➕</span> Add New Lead
-        </button>
+        <a href="my-leads.html" class="sidebar-btn primary-btn" style="text-decoration:none;">
+          <span class="sb-icon">⚡</span> My Leads (CRM Table)
+        </a>
 
         <button class="sidebar-btn" onclick="openSearchPanel()">
           <span class="sb-icon">🔍</span> Search Number
@@ -123,47 +122,6 @@
   </div>
 
   <!-- ── SLIDE-IN PANELS ─────────────────────────────────────────── -->
-
-  <!-- ADD LEAD PANEL -->
-  <div class="panel-overlay" id="addLeadOverlay" onclick="closePanel('addLead')"></div>
-  <div class="slide-panel" id="addLeadPanel">
-    <div class="panel-header">
-      <h3>➕ Add New Lead</h3>
-      <button class="panel-close" onclick="closePanel('addLead')">✕</button>
-    </div>
-    <div class="panel-body">
-      <p class="panel-note">💡 Use the Google Sheet to add a lead directly, or use this quick-add form below (coming soon with full CRUD integration).</p>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" id="addPhone" placeholder="e.g. 0771234567"/>
-      </div>
-      <div class="form-group">
-        <label>Assigned Member</label>
-        <select id="addMember">
-          <option value="">Select member...</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Grade</label>
-        <input type="text" id="addGrade" placeholder="e.g. 8 or 7,8"/>
-      </div>
-      <div class="form-group">
-        <label>Campaign / Boost</label>
-        <input type="text" id="addCampaign" placeholder="e.g. S26"/>
-      </div>
-      <div class="form-group">
-        <label>Initial Status</label>
-        <select id="addStatus">
-          <option>New</option>
-          <option>Contacted</option>
-          <option>No Answer</option>
-          <option>Interested</option>
-        </select>
-      </div>
-      <button class="btn-submit" onclick="submitAddLead()">Add Lead to Sheet</button>
-      <div id="addLeadResult" class="result-msg" style="display:none;"></div>
-    </div>
-  </div>
 
   <!-- SEARCH PANEL -->
   <div class="panel-overlay" id="searchOverlay" onclick="closePanel('search')"></div>

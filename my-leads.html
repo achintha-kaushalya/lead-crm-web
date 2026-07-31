@@ -37,6 +37,10 @@
           <option value="">— Select member —</option>
         </select>
         <button class="btn-refresh" onclick="loadLeads()">🔄 Refresh</button>
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search keywords..." oninput="onSearchInput()"/>
+        </div>
         <span class="lead-count-badge" id="leadCountBadge" style="display:none;"></span>
       </div>
       <div class="selector-right">

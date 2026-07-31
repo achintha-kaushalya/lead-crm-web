@@ -88,8 +88,42 @@ function filterStatus(status, btn) {
   applyFilter();
 }
 
+function onSearchInput() {
+  applyFilter();
+}
+
 function applyFilter() {
-  filteredLeads = activeStatus ? allLeads.filter(l => l.status === activeStatus) : allLeads;
+  const query = (document.getElementById("searchInput") ? document.getElementById("searchInput").value : "").trim().toLowerCase();
+
+  filteredLeads = allLeads.filter(l => {
+    // 1. Status pill filter
+    if (activeStatus && l.status !== activeStatus) return false;
+
+    // 2. Keyword search filter across all fields
+    if (query) {
+      const match =
+        (l.fcode && l.fcode.toLowerCase().includes(query)) ||
+        (l.phone && l.phone.toLowerCase().includes(query)) ||
+        (l.rawPhone && l.rawPhone.toLowerCase().includes(query)) ||
+        (l.member && l.member.toLowerCase().includes(query)) ||
+        (l.status && l.status.toLowerCase().includes(query)) ||
+        (l.grade && l.grade.toLowerCase().includes(query)) ||
+        (l.campaign && l.campaign.toLowerCase().includes(query)) ||
+        (l.comments && l.comments.toLowerCase().includes(query)) ||
+        (l.secondCallNotes && l.secondCallNotes.toLowerCase().includes(query)) ||
+        (l.date && l.date.toLowerCase().includes(query));
+      if (!match) return false;
+    }
+
+    return true;
+  });
+
+  // Update lead count badge with filtered count
+  const badge = document.getElementById("leadCountBadge");
+  if (badge) {
+    badge.textContent = `${filteredLeads.length} / ${allLeads.length} leads`;
+  }
+
   renderTable(filteredLeads);
 }
 
