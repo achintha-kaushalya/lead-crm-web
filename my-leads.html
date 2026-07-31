@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lead CRM — My Leads</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles/my-leads.css"/>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <header class="topnav">
+    <div class="topnav-left">
+      <a href="dashboard.html" class="back-btn">← Dashboard</a>
+      <div class="brand">
+        <span class="brand-icon">📋</span>
+        <span class="brand-name">My <span class="brand-crm">Leads</span></span>
+      </div>
+    </div>
+    <div class="topnav-right">
+      <div class="status-dot"></div>
+      <span class="status-text">Live</span>
+      <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <div class="page-body">
+
+    <!-- MEMBER SELECTOR BAR -->
+    <div class="selector-bar">
+      <div class="selector-left">
+        <label for="memberSelect">👤 View Leads For:</label>
+        <select id="memberSelect" onchange="loadLeads()">
+          <option value="">— Select a team member —</option>
+        </select>
+        <button class="btn-refresh" onclick="loadLeads()">🔄 Refresh</button>
+      </div>
+      <div class="selector-right">
+        <div class="filter-pills" id="statusPills">
+          <button class="pill active" data-status="" onclick="filterStatus('', this)">All</button>
+          <button class="pill" data-status="New" onclick="filterStatus('New', this)">New</button>
+          <button class="pill" data-status="No Answer" onclick="filterStatus('No Answer', this)">No Answer</button>
+          <button class="pill" data-status="Contacted" onclick="filterStatus('Contacted', this)">Contacted</button>
+          <button class="pill" data-status="Interested" onclick="filterStatus('Interested', this)">Interested</button>
+          <button class="pill" data-status="Second Call Pending" onclick="filterStatus('Second Call Pending', this)">2nd Call</button>
+          <button class="pill" data-status="Busy" onclick="filterStatus('Busy', this)">Busy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS STRIP -->
+    <div class="stats-strip" id="statsStrip" style="display:none;">
+      <div class="stat-chip">
+        <span class="chip-num" id="statTotal">0</span>
+        <span class="chip-label">Total Leads</span>
+      </div>
+      <div class="stat-chip green">
+        <span class="chip-num" id="statInterested">0</span>
+        <span class="chip-label">Interested</span>
+      </div>
+      <div class="stat-chip blue">
+        <span class="chip-num" id="statContacted">0</span>
+        <span class="chip-label">Contacted</span>
+      </div>
+      <div class="stat-chip yellow">
+        <span class="chip-num" id="statPending">0</span>
+        <span class="chip-label">2nd Call Pending</span>
+      </div>
+      <div class="stat-chip purple">
+        <span class="chip-num" id="statConverted">0</span>
+        <span class="chip-label">Converted</span>
+      </div>
+    </div>
+
+    <!-- TABLE AREA -->
+    <div class="table-wrapper" id="tableWrapper">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">👆</div>
+        <div class="empty-title">Select a team member above</div>
+        <div class="empty-sub">Their assigned leads will appear here</div>
+      </div>
+
+      <div class="loading-state" id="loadingState" style="display:none;">
+        <div class="spinner"></div>
+        <div>Loading leads from Google Sheets...</div>
+      </div>
+
+      <table class="leads-table" id="leadsTable" style="display:none;">
+        <thead>
+          <tr>
+            <th>F-Code</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Grade</th>
+            <th>Campaign</th>
+            <th>Date Added</th>
+            <th>2nd Call Done</th>
+            <th>2nd Call Notes</th>
+            <th class="col-action">Action</th>
+          </tr>
+        </thead>
+        <tbody id="leadsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SECOND CALL SLIDE PANEL ─────────────────────────────────── -->
+  <div class="panel-overlay" id="callOverlay" onclick="closeCallPanel()"></div>
+  <div class="slide-panel" id="callPanel">
+    <div class="panel-header">
+      <div>
+        <h3>📞 Second Call</h3>
+        <div class="panel-sub" id="panelFCodeLabel">F-Code: —</div>
+      </div>
+      <button class="panel-close" onclick="closeCallPanel()">✕</button>
+    </div>
+
+    <div class="panel-body">
+      <!-- Lead Summary card -->
+      <div class="lead-summary-card" id="leadSummaryCard"></div>
+
+      <div class="form-group">
+        <label>Update Status</label>
+        <select id="callStatus">
+          <option value="">— Keep current status —</option>
+          <option>New</option>
+          <option>Contacted</option>
+          <option>Interested</option>
+          <option>Converted</option>
+          <option>No Answer</option>
+          <option>Not Interested</option>
+          <option>Follow-up</option>
+          <option>Second Call Pending</option>
+          <option>Busy</option>
+          <option>Wrong number</option>
+          <option>Off</option>
+          <option>Invalid</option>
+          <option>Call Another Number</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Second Call Done?</label>
+        <div class="toggle-row">
+          <label class="toggle-label">
+            <input type="checkbox" id="callDoneCheck"/>
+            <span class="toggle-text">Mark as second call completed</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Second Call Notes</label>
+        <textarea id="callNotes" placeholder="What happened during this call? Any important information..." rows="5"></textarea>
+      </div>
+
+      <button class="btn-save" id="saveCallBtn" onclick="saveSecondCall()">
+        💾 Save & Update Master Sheet
+      </button>
+
+      <div id="saveResult" class="save-result" style="display:none;"></div>
+    </div>
+  </div>
+
+  <script src="scripts/my-leads.js"></script>
+</body>
+</html>
