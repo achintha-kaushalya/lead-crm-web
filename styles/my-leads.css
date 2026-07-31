@@ -197,78 +197,139 @@ tbody tr:hover { background: var(--bg-main); }
 .empty-icon { font-size: 32px; margin-bottom: 12px; color: var(--border); }
 .empty-text { font-size: 15px; font-weight: 600; }
 
+/* ── ACTION BUTTONS ── */
+.action-btns { display: flex; gap: 8px; }
+.btn-edit, .btn-del {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--border);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-edit:hover { background: var(--primary-light); color: var(--primary-dark); border-color: rgba(5,150,105,0.3); transform: translateY(-1px); }
+.btn-del:hover { background: #FEE2E2; color: #B91C1C; border-color: rgba(239,68,68,0.3); transform: translateY(-1px); }
+
+/* ── MODALS & GLASSMORPHISM ── */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.modal-overlay.active, .modal-overlay[style*="display: flex"] { opacity: 1; pointer-events: auto; }
+
+/* Edit Panel Slide-in */
+.slide-panel {
+  position: fixed; top: 0; right: -450px; width: 100%; max-width: 450px; height: 100vh;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+  z-index: 2001; transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex; flex-direction: column;
+}
+.slide-panel.open { right: 0; }
+
+.panel-header {
+  padding: 24px; border-bottom: 1px solid rgba(0,0,0,0.05);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.panel-header h3 { font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+.panel-close { background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; transition: color 0.2s; }
+.panel-close:hover { color: var(--danger); }
+
+.panel-body { padding: 24px; overflow-y: auto; flex: 1; }
+
+.readonly-card {
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px; padding: 16px; margin-bottom: 24px;
+}
+.rc-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+.rc-row:last-child { margin-bottom: 0; }
+.rc-label { color: var(--text-muted); font-weight: 600; }
+.rc-val { color: var(--text-main); font-weight: 700; }
+
+.section-label { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 0 12px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 10px 14px;
+  background: rgba(255,255,255,0.9); border: 1px solid var(--border);
+  border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px;
+  color: var(--text-main); transition: all 0.2s; outline: none;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background: #fff; }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+
+.toggle-row { display: flex; align-items: center; margin-bottom: 16px; }
+.toggle-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-main); }
+.toggle-label input { display: none; }
+.toggle-slider { width: 44px; height: 24px; background: #E2E8F0; border-radius: 24px; position: relative; transition: 0.3s; }
+.toggle-slider::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.toggle-label input:checked + .toggle-slider { background: var(--primary); }
+.toggle-label input:checked + .toggle-slider::after { transform: translateX(20px); }
+
+.btn-save {
+  width: 100%; padding: 14px; background: var(--primary); color: white;
+  border: none; border-radius: 12px; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; margin-top: 24px;
+}
+.btn-save:hover { background: var(--primary-dark); }
+.save-result { margin-top: 12px; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; }
+.save-result.success { background: var(--primary-light); color: var(--primary-dark); }
+.save-result.error { background: #FEF2F2; color: #B91C1C; }
+
+.danger-zone { margin-top: 40px; padding-top: 24px; border-top: 1px dashed #FCA5A5; }
+.danger-label { font-size: 12px; font-weight: 700; color: #DC2626; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;}
+.btn-delete {
+  width: 100%; padding: 12px; background: #FEF2F2; color: #DC2626;
+  border: 1px solid #FCA5A5; border-radius: 10px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-delete:hover { background: #FEE2E2; }
+
+/* Confirm Delete Modal */
+.confirm-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 32px; border-radius: 24px; width: 90%; max-width: 400px;
+  text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5);
+  transform: translateY(20px); transition: transform 0.3s;
+}
+.modal-overlay.active .confirm-modal, .modal-overlay[style*="display: flex"] .confirm-modal { transform: translateY(0); }
+.modal-icon { font-size: 48px; margin-bottom: 16px; }
+.confirm-modal h3 { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+.confirm-modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5; }
+.modal-btns { display: flex; gap: 12px; }
+.btn-cancel-delete { flex: 1; padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; font-weight: 600; cursor: pointer; color: var(--text-main); transition: background 0.2s; }
+.btn-cancel-delete:hover { background: #E5E7EB; }
+.btn-confirm-delete { flex: 1; padding: 12px; background: #DC2626; border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-confirm-delete:hover { background: #B91C1C; }
+
+/* Centered Loading Overlay */
 .loading-overlay {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.8); backdrop-filter: blur(2px);
+  background: rgba(255,255,255,0.7); backdrop-filter: blur(4px);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   z-index: 10;
 }
 .spinner {
-  width: 32px; height: 32px; border: 3px solid var(--border);
+  width: 40px; height: 40px; border: 4px solid var(--border);
   border-top-color: var(--primary); border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin-bottom: 12px;
+  animation: spin 0.8s linear infinite; margin-bottom: 16px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── MODALS ──────────────────────────────── */
-.modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15,23,42,0.4); backdrop-filter: blur(4px);
-  display: none; align-items: center; justify-content: center;
-  z-index: 2000; opacity: 0; transition: opacity 0.2s;
-}
-.modal-overlay.show { display: flex; opacity: 1; }
-
-.modal {
-  background: var(--white); width: 90%; max-width: 500px;
-  border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  transform: translateY(20px); transition: transform 0.2s;
-  overflow: hidden; display: flex; flex-direction: column;
-  max-height: 90vh;
-}
-.modal-overlay.show .modal { transform: translateY(0); }
-
-.modal-header {
-  padding: 20px 24px; border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-  background: var(--bg-main);
-}
-.modal-header h3 { font-size: 18px; font-weight: 700; color: var(--text-main); }
-.btn-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
-.btn-close:hover { color: var(--text-main); }
-
-.modal-body { padding: 24px; overflow-y: auto; }
-
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
-.form-group input, .form-group select, .form-group textarea {
-  width: 100%; padding: 10px 14px; border: 1px solid var(--border);
-  border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 14px;
-  color: var(--text-main); background: var(--bg-main); transition: all 0.2s; outline: none;
-}
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-  border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 3px var(--primary-light);
-}
-.form-group textarea { resize: vertical; min-height: 80px; }
-
-.modal-footer {
-  padding: 16px 24px; border-top: 1px solid var(--border); background: var(--bg-main);
-  display: flex; justify-content: flex-end; gap: 12px;
-}
-.btn-cancel {
-  padding: 10px 16px; background: var(--white); border: 1px solid var(--border);
-  border-radius: 10px; font-weight: 600; color: var(--text-main); cursor: pointer;
-}
-.btn-save {
-  padding: 10px 20px; background: var(--primary); border: none;
-  border-radius: 10px; font-weight: 600; color: white; cursor: pointer; transition: background 0.2s;
-}
-.btn-save:hover { background: var(--primary-dark); }
-.btn-delete {
-  padding: 10px 16px; background: #FEF2F2; border: 1px solid #FCA5A5;
-  border-radius: 10px; font-weight: 600; color: var(--danger); cursor: pointer;
-}
-.btn-delete:hover { background: #FEE2E2; }
 
 /* Toast */
 #toast {
