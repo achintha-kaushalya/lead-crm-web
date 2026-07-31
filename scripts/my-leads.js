@@ -12,7 +12,7 @@
 //  Get it from: Extensions → Apps Script → Deploy → Manage deployments → copy URL
 // ─────────────────────────────────────────────────────────────────────────────
 
-const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwem_r1yhevrAy1cDft0b-Fy9DASebc2YVgOtuINjhv48AVSMI11IObeC4nMPGthkg/exec";
 // Example: "https://script.google.com/macros/s/AKfycbxxxxxxxx/exec"
 
 const SESSION_KEY = "lead_crm_session";
