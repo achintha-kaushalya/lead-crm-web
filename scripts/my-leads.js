@@ -1,96 +1,86 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  MY LEADS PAGE — Lead CRM
-//
-//  HOW IT WORKS:
-//  1. On load, fetches member list from Apps Script Web App (doGet?action=getMembers)
-//  2. When member selected, fetches their leads (doGet?action=getLeads&member=NAME)
-//  3. Renders a web table — no Excel filter involved
-//  4. "Second Call" button opens slide-in panel
-//  5. On save, POSTs to Apps Script doPost → updates the Master Leads sheet row
-//
-//  IMPORTANT: Replace APPS_SCRIPT_URL below with your deployed Web App URL!
-//  Get it from: Extensions → Apps Script → Deploy → Manage deployments → copy URL
+//  MY LEADS — Full CRUD (Read, Update, Delete) via Apps Script Web App API
 // ─────────────────────────────────────────────────────────────────────────────
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwem_r1yhevrAy1cDft0b-Fy9DASebc2YVgOtuINjhv48AVSMI11IObeC4nMPGthkg/exec";
-// Example: "https://script.google.com/macros/s/AKfycbxxxxxxxx/exec"
-
-const SESSION_KEY = "lead_crm_session";
+const SESSION_KEY     = "lead_crm_session";
 
 // ── Auth Guard ────────────────────────────────────────────────────────────────
 (function checkAuth() {
   if (!sessionStorage.getItem(SESSION_KEY)) window.location.href = "index.html";
 })();
-
 function handleLogout() {
-  if (confirm("Sign out?")) {
-    sessionStorage.removeItem(SESSION_KEY);
-    window.location.href = "index.html";
-  }
+  if (confirm("Sign out?")) { sessionStorage.removeItem(SESSION_KEY); window.location.href = "index.html"; }
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let allLeads       = [];   // all leads for current member
-let filteredLeads  = [];   // after status pill filter
-let activeStatus   = "";   // current status pill filter
-let currentLead    = null; // lead open in second-call panel
+let allLeads      = [];
+let filteredLeads = [];
+let activeStatus  = "";
+let currentLead   = null;
+let membersList   = [];
 
-// ── Load Members into Dropdown ────────────────────────────────────────────────
+// ── Load Members ──────────────────────────────────────────────────────────────
 async function loadMembers() {
   const select = document.getElementById("memberSelect");
   try {
     const res  = await fetch(`${APPS_SCRIPT_URL}?action=getMembers`);
     const data = await res.json();
-    if (data.members && data.members.length) {
-      data.members.forEach(name => {
-        const opt = document.createElement("option");
-        opt.value       = name;
-        opt.textContent = name;
-        select.appendChild(opt);
-      });
-    }
-  } catch (err) {
-    // If URL not set yet, show placeholder members
-    console.warn("Could not load members:", err);
-    const placeholder = ["(Set Apps Script URL to load members)"];
-    placeholder.forEach(name => {
+    membersList = data.members || [];
+    membersList.forEach(name => {
       const opt = document.createElement("option");
-      opt.value       = name;
-      opt.textContent = name;
+      opt.value = opt.textContent = name;
       select.appendChild(opt);
     });
+    // Populate edit panel member select
+    populateEditMemberSelect();
+  } catch (err) {
+    console.warn("Members load error:", err);
   }
 }
 
-// ── Load Leads for Selected Member ───────────────────────────────────────────
+function populateEditMemberSelect() {
+  const sel = document.getElementById("editMember");
+  sel.innerHTML = '<option value="">— Select —</option>';
+  membersList.forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = opt.textContent = name;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Load Leads ────────────────────────────────────────────────────────────────
 async function loadLeads() {
   const member = document.getElementById("memberSelect").value;
   if (!member) return;
 
-  showLoading(true);
+  setUIState("loading");
 
   try {
     const url  = `${APPS_SCRIPT_URL}?action=getLeads&member=${encodeURIComponent(member)}`;
     const res  = await fetch(url);
     const data = await res.json();
 
-    allLeads = data.leads || [];
+    allLeads     = data.leads || [];
     activeStatus = "";
-    // Reset pills
+    // reset pills
     document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
     document.querySelector(".pill[data-status='']").classList.add("active");
+
+    const badge = document.getElementById("leadCountBadge");
+    badge.textContent = `${allLeads.length} leads`;
+    badge.style.display = allLeads.length ? "inline-block" : "none";
 
     applyFilter();
     updateStats(allLeads);
     document.getElementById("statsStrip").style.display = "flex";
 
   } catch (err) {
-    showLoading(false);
-    showError("⚠ Could not connect to Google Sheets API. Check your Apps Script URL.");
+    setUIState("error", "⚠ Cannot connect to Google Sheets. Check Apps Script deployment.");
   }
 }
 
-// ── Apply Status Pill Filter ──────────────────────────────────────────────────
+// ── Filter ────────────────────────────────────────────────────────────────────
 function filterStatus(status, btn) {
   activeStatus = status;
   document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
@@ -99,200 +89,270 @@ function filterStatus(status, btn) {
 }
 
 function applyFilter() {
-  filteredLeads = activeStatus
-    ? allLeads.filter(l => l.status === activeStatus)
-    : allLeads;
+  filteredLeads = activeStatus ? allLeads.filter(l => l.status === activeStatus) : allLeads;
   renderTable(filteredLeads);
 }
 
 // ── Render Table ──────────────────────────────────────────────────────────────
 function renderTable(leads) {
-  showLoading(false);
-  const tbody = document.getElementById("leadsBody");
-  const table = document.getElementById("leadsTable");
-  const empty = document.getElementById("emptyState");
+  const tbody  = document.getElementById("leadsBody");
+  const scroll = document.getElementById("tableScroll");
+  const empty  = document.getElementById("emptyState");
 
   tbody.innerHTML = "";
+  setUIState("done");
 
   if (!leads.length) {
-    table.style.display = "none";
-    empty.style.display = "flex";
+    scroll.style.display = "none";
+    empty.style.display  = "flex";
     empty.querySelector(".empty-icon").textContent  = "📭";
     empty.querySelector(".empty-title").textContent = "No leads found";
-    empty.querySelector(".empty-sub").textContent   = activeStatus
-      ? `No leads with status "${activeStatus}" for this member`
-      : "This member has no assigned leads";
+    empty.querySelector(".empty-sub").textContent   =
+      activeStatus ? `No leads with status "${activeStatus}"` : "No leads assigned to this member";
     return;
   }
 
-  table.style.display = "table";
-  empty.style.display = "none";
+  scroll.style.display = "flex";
+  empty.style.display  = "none";
 
   leads.forEach(lead => {
     const tr = document.createElement("tr");
-    if (lead.status === "Second Call Pending") tr.classList.add("warning-row");
+    if (lead.status === "Second Call Pending") tr.classList.add("highlight-row");
 
     tr.innerHTML = `
       <td class="fcode-cell">${esc(lead.fcode)}</td>
       <td class="phone-cell">${esc(lead.phone || lead.rawPhone)}</td>
+      <td class="member-cell">${esc(lead.member) || "—"}</td>
+      <td style="white-space:nowrap;">${esc(lead.date) || "—"}</td>
       <td>${statusBadge(lead.status)}</td>
       <td>${esc(lead.grade) || "—"}</td>
+      <td class="truncate-cell" title="${esc(lead.comments)}">${esc(lead.comments) || "—"}</td>
       <td>${esc(lead.campaign) || "—"}</td>
-      <td>${esc(lead.date) || "—"}</td>
       <td style="text-align:center;">${lead.secondCallDone === "Yes"
-        ? '<span class="done-yes">✓</span>'
+        ? '<span class="done-yes">✓ Yes</span>'
         : '<span class="done-no">—</span>'}</td>
-      <td style="max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${esc(lead.secondCallNotes)}">${esc(lead.secondCallNotes) || "—"}</td>
-      <td class="col-action">
-        <button class="btn-second-call" onclick="openCallPanel(${JSON.stringify(lead.fcode)})">
-          📞 2nd Call
-        </button>
+      <td class="truncate-cell" title="${esc(lead.secondCallNotes)}">${esc(lead.secondCallNotes) || "—"}</td>
+      <td class="col-actions">
+        <div class="action-btns">
+          <button class="btn-edit" onclick="openEditPanel('${esc(lead.fcode)}')">✏ Edit</button>
+          <button class="btn-del"  onclick="confirmDeleteLead('${esc(lead.fcode)}')">🗑</button>
+        </div>
       </td>`;
     tbody.appendChild(tr);
   });
 }
 
-// ── Status Badge HTML ─────────────────────────────────────────────────────────
-function statusBadge(status) {
+// ── Status Badge ──────────────────────────────────────────────────────────────
+function statusBadge(s) {
   const map = {
-    "New":                  "s-new",
-    "Contacted":            "s-contacted",
-    "Interested":           "s-interested",
-    "Converted":            "s-converted",
-    "No Answer":            "s-no-answer",
-    "Not Interested":       "s-not-interested",
-    "Follow-up":            "s-follow-up",
-    "Second Call Pending":  "s-second-call",
-    "Busy":                 "s-busy",
+    "New":"b-new","Contacted":"b-contacted","Interested":"b-interested",
+    "Converted":"b-converted","No Answer":"b-no-answer","Not Interested":"b-not-interested",
+    "Follow-up":"b-follow-up","Second Call Pending":"b-second-call","Busy":"b-busy"
   };
-  const cls = map[status] || "s-default";
-  return `<span class="status-badge ${cls}">${esc(status) || "—"}</span>`;
+  return `<span class="badge ${map[s]||'b-default'}">${esc(s)||"—"}</span>`;
 }
 
-// ── Stats Strip Update ────────────────────────────────────────────────────────
+// ── Stats ─────────────────────────────────────────────────────────────────────
 function updateStats(leads) {
   document.getElementById("statTotal").textContent     = leads.length;
-  document.getElementById("statInterested").textContent= leads.filter(l => l.status === "Interested").length;
-  document.getElementById("statContacted").textContent = leads.filter(l => l.status === "Contacted").length;
-  document.getElementById("statPending").textContent   = leads.filter(l => l.status === "Second Call Pending").length;
-  document.getElementById("statConverted").textContent = leads.filter(l => l.status === "Converted").length;
+  document.getElementById("statInterested").textContent= count(leads,"Interested");
+  document.getElementById("statContacted").textContent = count(leads,"Contacted");
+  document.getElementById("statPending").textContent   = count(leads,"Second Call Pending");
+  document.getElementById("statConverted").textContent = count(leads,"Converted");
+  document.getElementById("statNoAnswer").textContent  = count(leads,"No Answer");
 }
+function count(arr, status) { return arr.filter(l => l.status === status).length; }
 
-// ── Second Call Panel ─────────────────────────────────────────────────────────
-function openCallPanel(fcode) {
+// ── Edit Panel ────────────────────────────────────────────────────────────────
+function openEditPanel(fcode) {
   currentLead = allLeads.find(l => l.fcode === fcode);
   if (!currentLead) return;
 
-  document.getElementById("panelFCodeLabel").textContent = `F-Code: ${currentLead.fcode}`;
-  document.getElementById("callStatus").value    = currentLead.status || "";
-  document.getElementById("callDoneCheck").checked = currentLead.secondCallDone === "Yes";
-  document.getElementById("callNotes").value     = currentLead.secondCallNotes || "";
-  document.getElementById("saveResult").style.display = "none";
+  const l = currentLead;
+  document.getElementById("editFCodeLabel").textContent = l.fcode;
 
-  // Lead summary card
-  document.getElementById("leadSummaryCard").innerHTML = `
-    <div class="lsc-row"><span class="lsc-label">Phone</span>      <span class="lsc-val">${esc(currentLead.phone || currentLead.rawPhone)}</span></div>
-    <div class="lsc-row"><span class="lsc-label">Member</span>     <span class="lsc-val">${esc(currentLead.member)}</span></div>
-    <div class="lsc-row"><span class="lsc-label">Current Status</span><span class="lsc-val">${esc(currentLead.status)}</span></div>
-    <div class="lsc-row"><span class="lsc-label">Grade</span>      <span class="lsc-val">${esc(currentLead.grade) || "—"}</span></div>
-    <div class="lsc-row"><span class="lsc-label">Campaign</span>   <span class="lsc-val">${esc(currentLead.campaign) || "—"}</span></div>
-    <div class="lsc-row"><span class="lsc-label">Date Added</span> <span class="lsc-val">${esc(currentLead.date) || "—"}</span></div>
+  // Readonly card
+  document.getElementById("readonlyCard").innerHTML = `
+    <div class="rc-row"><span class="rc-label">📞 Phone</span>    <span class="rc-val">${esc(l.phone||l.rawPhone)}</span></div>
+    <div class="rc-row"><span class="rc-label">🆔 F-Code</span>   <span class="rc-val">${esc(l.fcode)}</span></div>
+    <div class="rc-row"><span class="rc-label">📅 Date Added</span><span class="rc-val">${esc(l.date)||"—"}</span></div>
   `;
 
-  document.getElementById("callOverlay").classList.add("active");
-  document.getElementById("callPanel").classList.add("open");
+  // Pre-fill editable fields
+  document.getElementById("editMember").value         = l.member     || "";
+  document.getElementById("editStatus").value         = l.status     || "New";
+  document.getElementById("editGrade").value          = l.grade      || "";
+  document.getElementById("editCampaign").value       = l.campaign   || "";
+  document.getElementById("editComments").value       = l.comments   || "";
+  document.getElementById("editSecondCallDone").checked = (l.secondCallDone === "Yes");
+  document.getElementById("editSecondCallNotes").value  = l.secondCallNotes || "";
+  document.getElementById("saveResult").style.display   = "none";
+
+  document.getElementById("editOverlay").classList.add("active");
+  document.getElementById("editPanel").classList.add("open");
 }
 
-function closeCallPanel() {
-  document.getElementById("callOverlay").classList.remove("active");
-  document.getElementById("callPanel").classList.remove("open");
+function closeEditPanel() {
+  document.getElementById("editOverlay").classList.remove("active");
+  document.getElementById("editPanel").classList.remove("open");
   currentLead = null;
 }
 
-// ── Save Second Call → POST to Apps Script ────────────────────────────────────
-async function saveSecondCall() {
+// ── Save (Update) ─────────────────────────────────────────────────────────────
+async function saveLead() {
   if (!currentLead) return;
 
-  const btn       = document.getElementById("saveCallBtn");
-  const resultEl  = document.getElementById("saveResult");
-  const newStatus = document.getElementById("callStatus").value;
-  const doneBool  = document.getElementById("callDoneCheck").checked;
-  const notes     = document.getElementById("callNotes").value.trim();
+  const btn    = document.getElementById("saveBtn");
+  const resEl  = document.getElementById("saveResult");
 
-  btn.disabled     = true;
-  btn.textContent  = "⏳ Saving...";
-  resultEl.style.display = "none";
+  btn.disabled    = true;
+  btn.textContent = "⏳ Saving to Google Sheets...";
+  resEl.style.display = "none";
 
   const payload = {
     action:          "updateLead",
     fcode:           currentLead.fcode,
-    status:          newStatus || currentLead.status,
-    secondCallDone:  doneBool ? "Yes" : "No",
-    secondCallNotes: notes
+    member:          document.getElementById("editMember").value,
+    status:          document.getElementById("editStatus").value,
+    grade:           document.getElementById("editGrade").value.trim(),
+    campaign:        document.getElementById("editCampaign").value.trim(),
+    comments:        document.getElementById("editComments").value.trim(),
+    secondCallDone:  document.getElementById("editSecondCallDone").checked ? "Yes" : "No",
+    secondCallNotes: document.getElementById("editSecondCallNotes").value.trim()
   };
 
   try {
     const res  = await fetch(APPS_SCRIPT_URL, {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload)
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
 
     if (data.success) {
-      // Update local state so table reflects change immediately
+      // Update local state immediately
       const idx = allLeads.findIndex(l => l.fcode === currentLead.fcode);
-      if (idx !== -1) {
-        allLeads[idx].status          = payload.status;
-        allLeads[idx].secondCallDone  = payload.secondCallDone;
-        allLeads[idx].secondCallNotes = payload.secondCallNotes;
-      }
+      if (idx !== -1) Object.assign(allLeads[idx], {
+        member:          payload.member,
+        status:          payload.status,
+        grade:           payload.grade,
+        campaign:        payload.campaign,
+        comments:        payload.comments,
+        secondCallDone:  payload.secondCallDone,
+        secondCallNotes: payload.secondCallNotes
+      });
       applyFilter();
       updateStats(allLeads);
-
-      showPanelResult("success", `✅ Updated! Row ${data.updatedRow} in Master Leads saved.`);
-      setTimeout(closeCallPanel, 2000);
+      showPanelResult("success", `✅ Row ${data.updatedRow} updated in Master Leads!`);
+      setTimeout(closeEditPanel, 2000);
     } else {
-      showPanelResult("error", `❌ Error: ${data.error}`);
+      showPanelResult("error", `❌ ${data.error}`);
     }
   } catch (err) {
-    showPanelResult("error", `❌ Network error. Check Apps Script URL.\n${err.message}`);
+    showPanelResult("error", `❌ Network error: ${err.message}`);
   } finally {
     btn.disabled    = false;
-    btn.textContent = "💾 Save & Update Master Sheet";
+    btn.textContent = "💾 Save Changes to Master Sheet";
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function showLoading(on) {
-  document.getElementById("loadingState").style.display = on ? "flex"  : "none";
-  document.getElementById("leadsTable").style.display   = on ? "none"  : "";
-  document.getElementById("emptyState").style.display   = on ? "none"  : "";
+// ── Delete ────────────────────────────────────────────────────────────────────
+let pendingDeleteFCode = null;
+
+function confirmDeleteLead(fcode) {
+  const lead = allLeads.find(l => l.fcode === fcode);
+  if (!lead) return;
+  pendingDeleteFCode = fcode;
+  document.getElementById("deleteModalMsg").textContent =
+    `This will permanently remove ${fcode} (${lead.phone || lead.rawPhone}) from Master Leads. This cannot be undone.`;
+  document.getElementById("deleteModalOverlay").style.display = "flex";
 }
 
-function showError(msg) {
-  const empty = document.getElementById("emptyState");
-  empty.style.display = "flex";
-  empty.querySelector(".empty-icon").textContent  = "⚠";
-  empty.querySelector(".empty-title").textContent = "Connection Error";
-  empty.querySelector(".empty-sub").textContent   = msg;
+function closeDeleteModal() {
+  document.getElementById("deleteModalOverlay").style.display = "none";
+  pendingDeleteFCode = null;
+}
+
+async function deleteLead() {
+  if (!pendingDeleteFCode) return;
+
+  const confirmBtn = document.getElementById("confirmDeleteBtn");
+  confirmBtn.disabled    = true;
+  confirmBtn.textContent = "⏳ Deleting...";
+
+  try {
+    const res  = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "deleteLead", fcode: pendingDeleteFCode })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      // Remove from local state
+      allLeads = allLeads.filter(l => l.fcode !== pendingDeleteFCode);
+      applyFilter();
+      updateStats(allLeads);
+      closeDeleteModal();
+      closeEditPanel();
+      showToast(`🗑 ${pendingDeleteFCode} deleted from Master Leads`);
+    } else {
+      alert(`❌ Delete failed: ${data.error}`);
+    }
+  } catch (err) {
+    alert(`❌ Network error: ${err.message}`);
+  } finally {
+    confirmBtn.disabled    = false;
+    confirmBtn.textContent = "Delete Permanently";
+  }
+}
+
+// ── UI State Helper ───────────────────────────────────────────────────────────
+function setUIState(state, msg = "") {
+  const loading = document.getElementById("loadingState");
+  const empty   = document.getElementById("emptyState");
+  const scroll  = document.getElementById("tableScroll");
+
+  loading.style.display = state === "loading" ? "flex"  : "none";
+  if (state === "loading") { scroll.style.display = "none"; empty.style.display = "none"; }
+  if (state === "error") {
+    empty.style.display = "flex";
+    empty.querySelector(".empty-icon").textContent  = "⚠";
+    empty.querySelector(".empty-title").textContent = "Connection Error";
+    empty.querySelector(".empty-sub").textContent   = msg;
+  }
 }
 
 function showPanelResult(type, msg) {
   const el = document.getElementById("saveResult");
-  el.className          = `save-result ${type}`;
-  el.textContent        = msg;
-  el.style.display      = "block";
-  el.style.whiteSpace   = "pre-wrap";
+  el.className = `save-result ${type}`;
+  el.textContent = msg;
+  el.style.display = "block";
 }
 
-function esc(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, ms = 3500) {
+  let t = document.getElementById("_toast");
+  if (!t) {
+    t = document.createElement("div"); t.id = "_toast";
+    t.style.cssText =
+      "position:fixed;bottom:28px;left:50%;transform:translateX(-50%);" +
+      "background:#0F172A;color:#fff;padding:10px 22px;border-radius:30px;" +
+      "font-family:Inter,sans-serif;font-size:13px;font-weight:600;z-index:9999;" +
+      "box-shadow:0 4px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .3s;" +
+      "pointer-events:none;max-width:90vw;text-align:center;";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = "1";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.opacity = "0"; }, ms);
+}
+
+// ── Escape HTML ───────────────────────────────────────────────────────────────
+function esc(s) {
+  if (!s) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
