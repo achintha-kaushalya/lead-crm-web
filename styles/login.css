@@ -91,25 +91,56 @@ body::after { bottom: -150px; right: -150px; }
 .left-panel h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; letter-spacing: -1px; }
 .left-panel p { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 40px; max-width: 400px; }
 
-/* Marketing Graphic CSS */
-.graphic-placeholder { position: relative; height: 350px; }
-.node {
-  position: absolute; display: flex; align-items: center; justify-content: center;
-  background: var(--white); border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  border: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-main);
-}
-.main-node { width: 64px; height: 64px; top: 0; left: 0; color: var(--primary); }
-.sub-node { padding: 8px 16px; gap: 8px; }
-.node-icon { font-size: 16px; }
-.node-1 { top: 70px; left: 80px; }
-.node-2 { top: 120px; left: 240px; }
-.node-3 { top: 180px; left: 40px; }
-
-.steps-box { margin-top: 100px; display: flex; flex-direction: column; gap: 16px; }
-.step { display: flex; align-items: center; gap: 16px; background: var(--white); padding: 16px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-.step-num { width: 32px; height: 32px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 700; font-size: 14px; flex-shrink:0;}
-.step-text h4 { font-size: 14px; margin-bottom: 2px; }
-.step-text p { font-size: 12px; color: var(--text-muted); margin: 0; }
+  /* Glassmorphism Graphic CSS */
+  .glass-graphic {
+    position: relative;
+    height: 350px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 40px;
+  }
+  
+  .glass-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(5, 150, 105, 0.1);
+    display: flex;
+    align-items: center;
+    color: var(--text-main);
+  }
+  
+  .main-glass {
+    top: 20px;
+    left: 20px;
+    padding: 24px;
+    gap: 16px;
+    z-index: 2;
+    animation: float 6s ease-in-out infinite;
+  }
+  .glass-icon { color: var(--primary); background: var(--white); padding: 8px; border-radius: 12px; width: 48px; height: 48px;}
+  .glass-text h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .glass-text p { font-size: 12px; color: var(--text-muted); margin: 0; }
+  
+  .sub-glass {
+    padding: 12px 20px;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .glass-icon-small { font-size: 16px; }
+  
+  .float-1 { top: 130px; right: 0; animation: float 7s ease-in-out infinite 1s; }
+  .float-2 { top: 200px; left: 40px; animation: float 8s ease-in-out infinite 2s; }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
 
 /* Right Panel */
 .right-panel {

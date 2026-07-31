@@ -36,43 +36,21 @@
         <h1>Build your<br/>sales workspace</h1>
         <p>Connect your team, assign leads, and launch automation from one central dashboard.</p>
         
-        <div class="graphic-placeholder">
-          <!-- Simplified CSS Graphic representing nodes/connections -->
-          <div class="node main-node">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
-          </div>
-          <div class="node sub-node node-1">
-            <span class="node-icon">👤</span> Shared Inbox
-          </div>
-          <div class="node sub-node node-2">
-            <span class="node-icon">👥</span> Multiple Agents
-          </div>
-          <div class="node sub-node node-3">
-            <span class="node-icon">⚡</span> Campaigns
-          </div>
-
-          <div class="steps-box">
-            <div class="step">
-              <div class="step-num">1</div>
-              <div class="step-text">
-                <h4>Connect a sheet</h4>
-                <p>Sync your business leads in a few clicks</p>
-              </div>
+        <div class="glass-graphic">
+          <div class="glass-card main-glass">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" class="glass-icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+            <div class="glass-text">
+              <h4>LeadCRM Active</h4>
+              <p>System running optimally</p>
             </div>
-            <div class="step">
-              <div class="step-num">2</div>
-              <div class="step-text">
-                <h4>Invite your team</h4>
-                <p>Assign access and keep conversations moving</p>
-              </div>
-            </div>
-            <div class="step">
-              <div class="step-num">3</div>
-              <div class="step-text">
-                <h4>Launch sales</h4>
-                <p>Route leads, reply, and convert automatically</p>
-              </div>
-            </div>
+          </div>
+          <div class="glass-card sub-glass float-1">
+            <span class="glass-icon-small">⚡</span>
+            <span>Real-time Sync</span>
+          </div>
+          <div class="glass-card sub-glass float-2">
+            <span class="glass-icon-small">🔒</span>
+            <span>Secure Access</span>
           </div>
         </div>
       </div>
@@ -96,8 +74,10 @@
             <label for="password">Password *</label>
             <div class="input-wrapper-modern">
               <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" class="modern-input"/>
-              <button type="button" class="toggle-pw-modern" onclick="togglePassword()" id="toggleBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <button type="button" class="toggle-pw-modern" onclick="togglePassword()">
+                <span id="toggleBtn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
               </button>
             </div>
           </div>
@@ -115,7 +95,10 @@
             ⚠ Incorrect email or password.
           </div>
 
-          <button type="submit" class="btn-submit">Sign In to Workspace</button>
+          <button type="submit" class="btn-submit" id="loginBtn">
+            <span id="btnText">Sign In to Workspace</span>
+            <span id="btnLoader" style="display:none;">Signing in...</span>
+          </button>
           
           <div class="divider">
             <span>OR USE YOUR SOCIAL ACCOUNT TO REGISTER</span>
