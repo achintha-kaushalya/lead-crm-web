@@ -219,11 +219,15 @@ body::after { bottom: -150px; right: -150px; }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .global-header { padding: 20px; }
+  .global-header { padding: 16px 20px; }
   .header-links { display: none; }
-  .login-wrapper { flex-direction: column; padding-top: 70px; height: auto; }
-  .left-panel { padding: 40px 20px; text-align: center; }
-  .left-panel p { margin: 0 auto 40px; }
-  .right-panel { border-left: none; border-radius: 0; box-shadow: none; border-top: 1px solid var(--border); }
-  .graphic-placeholder { display: none; }
+  .login-wrapper { flex-direction: column; padding-top: 80px; height: auto; }
+  .left-panel { padding: 40px 20px; text-align: center; display: block; }
+  .left-content-inner { margin: 0 auto; }
+  .left-panel h1 { font-size: 36px; margin-bottom: 12px; }
+  .left-panel p { margin: 0 auto 30px; font-size: 15px; }
+  .glass-graphic { display: none; } /* Hide graphic on mobile for cleaner look */
+  
+  .right-panel { border-left: none; border-radius: 24px 24px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); padding: 40px 20px; }
+  .login-box { margin: 0 auto; max-width: 100%; }
 }
