@@ -222,29 +222,37 @@ async function saveLead() {
   };
 
   try {
-    const res  = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    // Use GET with URLSearchParams to avoid CORS preflight (Apps Script blocks POST cross-origin)
+    const params = new URLSearchParams({
+      action:          "updateLead",
+      fcode:           currentLead.fcode,
+      member:          document.getElementById("editMember").value,
+      status:          document.getElementById("editStatus").value,
+      grade:           document.getElementById("editGrade").value.trim(),
+      campaign:        document.getElementById("editCampaign").value.trim(),
+      comments:        document.getElementById("editComments").value.trim(),
+      secondCallDone:  document.getElementById("editSecondCallDone").checked ? "Yes" : "No",
+      secondCallNotes: document.getElementById("editSecondCallNotes").value.trim()
     });
+    const res  = await fetch(`${APPS_SCRIPT_URL}?${params}`);
     const data = await res.json();
 
     if (data.success) {
-      // Update local state immediately
-      const idx = allLeads.findIndex(l => l.fcode === currentLead.fcode);
-      if (idx !== -1) Object.assign(allLeads[idx], {
-        member:          payload.member,
-        status:          payload.status,
-        grade:           payload.grade,
-        campaign:        payload.campaign,
-        comments:        payload.comments,
-        secondCallDone:  payload.secondCallDone,
-        secondCallNotes: payload.secondCallNotes
-      });
-      applyFilter();
-      updateStats(allLeads);
-      showPanelResult("success", `✅ Row ${data.updatedRow} updated in Master Leads!`);
-      setTimeout(closeEditPanel, 2000);
+    // Update local state immediately (before close)
+    const idx = allLeads.findIndex(l => l.fcode === currentLead.fcode);
+    if (idx !== -1) Object.assign(allLeads[idx], {
+      member:          document.getElementById("editMember").value,
+      status:          document.getElementById("editStatus").value,
+      grade:           document.getElementById("editGrade").value.trim(),
+      campaign:        document.getElementById("editCampaign").value.trim(),
+      comments:        document.getElementById("editComments").value.trim(),
+      secondCallDone:  document.getElementById("editSecondCallDone").checked ? "Yes" : "No",
+      secondCallNotes: document.getElementById("editSecondCallNotes").value.trim()
+    });
+    applyFilter();
+    updateStats(allLeads);
+    showPanelResult("success", `✅ Row ${data.updatedRow} updated in Master Leads!`);
+    setTimeout(closeEditPanel, 2000);
     } else {
       showPanelResult("error", `❌ ${data.error}`);
     }
@@ -281,11 +289,9 @@ async function deleteLead() {
   confirmBtn.textContent = "⏳ Deleting...";
 
   try {
-    const res  = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "deleteLead", fcode: pendingDeleteFCode })
-    });
+    // Use GET with URLSearchParams to avoid CORS preflight
+    const params = new URLSearchParams({ action: "deleteLead", fcode: pendingDeleteFCode });
+    const res  = await fetch(`${APPS_SCRIPT_URL}?${params}`);
     const data = await res.json();
 
     if (data.success) {
