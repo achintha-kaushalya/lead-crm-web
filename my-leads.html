@@ -10,40 +10,50 @@
 </head>
 <body>
 
-  <!-- TOP NAV -->
+  <!-- ── TOP NAV ──────────────────────────────────────────────────── -->
   <header class="topnav">
     <div class="topnav-left">
-      <a href="dashboard.html" class="back-btn">← Dashboard</a>
+      <a href="dashboard.html" class="back-btn">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"/></svg> Back
+      </a>
       <div class="brand">
-        <span class="brand-icon">📋</span>
-        <span class="brand-name">My <span class="brand-crm">Leads</span></span>
+        <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+        <span class="brand-name">LeadCRM</span>
       </div>
     </div>
     <div class="topnav-right">
       <div class="status-dot"></div>
-      <span class="status-text">Live</span>
+      <span class="status-text">Live CRM</span>
       <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
     </div>
   </header>
 
-  <!-- MAIN PAGE -->
+  <!-- ── PAGE BODY ────────────────────────────────────────────────── -->
   <div class="page-body">
 
-    <!-- SELECTOR + FILTER BAR -->
+    <!-- ── 1. SELECTOR BAR ── -->
     <div class="selector-bar">
       <div class="selector-left">
-        <label>👤 Member:</label>
+        <label>
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Member:
+        </label>
         <select id="memberSelect" onchange="loadLeads()">
-          <option value="">All Members</option>
+          <option value="">— Select member —</option>
         </select>
-        <button class="btn-refresh" onclick="loadLeads(true)">🔄 Refresh</button>
+        <button class="btn-refresh" onclick="loadLeads()">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          Refresh
+        </button>
         <div class="search-input-wrapper">
-          <span class="search-icon">🔍</span>
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
           <input type="text" id="searchInput" placeholder="Search keywords..." oninput="onSearchInput()"/>
         </div>
-        <span class="lead-count-badge" id="leadCountBadge" style="display:none;"></span>
       </div>
       <div class="selector-right">
+        <span class="lead-count-badge" id="leadCountBadge">0 leads found</span>
         <div class="filter-pills" id="statusPills">
           <button class="pill active" data-status="" onclick="filterStatus('',this)">All</button>
           <button class="pill" data-status="New" onclick="filterStatus('New',this)">New</button>
