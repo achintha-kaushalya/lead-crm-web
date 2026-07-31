@@ -130,18 +130,49 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-mai
 .pill:hover { background: var(--bg-main); color: var(--text-main); }
 .pill.active { background: var(--primary); border-color: var(--primary); color: white; }
 
-/* ── STATS STRIP ─────────────────────────── */
+/* ── STATS STRIP (VIBRANT GLASSMORPHISM) ── */
 .stats-strip {
-  display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0;
+  display: flex; gap: 16px; flex-wrap: wrap; flex-shrink: 0;
 }
 .stat-chip {
-  background: var(--white); border: 1px solid var(--border); border-radius: 12px;
-  padding: 12px 16px; display: flex; flex-direction: column; min-width: 130px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  padding: 16px 20px; display: flex; flex-direction: column; min-width: 140px; flex: 1;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.stat-chip-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
-.stat-chip-val { font-size: 20px; font-weight: 800; color: var(--primary); }
+.stat-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.chip-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+.chip-num { font-size: 24px; font-weight: 800; color: var(--text-main); }
 
-/* ── TABLE CONTAINER ─────────────────────── */
+/* Color variations for chips */
+.stat-chip.green { background: rgba(209, 250, 229, 0.7); border-color: rgba(16, 185, 129, 0.2); }
+.stat-chip.green .chip-num { color: #047857; }
+.stat-chip.green .chip-label { color: #065F46; }
+
+.stat-chip.blue { background: rgba(219, 234, 254, 0.7); border-color: rgba(59, 130, 246, 0.2); }
+.stat-chip.blue .chip-num { color: #1D4ED8; }
+.stat-chip.blue .chip-label { color: #1E40AF; }
+
+.stat-chip.yellow { background: rgba(254, 243, 199, 0.7); border-color: rgba(245, 158, 11, 0.2); }
+.stat-chip.yellow .chip-num { color: #B45309; }
+.stat-chip.yellow .chip-label { color: #92400E; }
+
+.stat-chip.purple { background: rgba(237, 233, 254, 0.7); border-color: rgba(139, 92, 246, 0.2); }
+.stat-chip.purple .chip-num { color: #6D28D9; }
+.stat-chip.purple .chip-label { color: #5B21B6; }
+
+.stat-chip.red { background: rgba(254, 226, 226, 0.7); border-color: rgba(239, 68, 68, 0.2); }
+.stat-chip.red .chip-num { color: #B91C1C; }
+.stat-chip.red .chip-label { color: #991B1B; }
+
+/* ── TABLE CONTAINER ── */
 .table-container {
   flex: 1; background: var(--white); border-radius: 16px;
   border: 1px solid var(--border); overflow-y: auto; overflow-x: auto;
@@ -195,8 +226,11 @@ tbody tr:hover { background: #F1F5F9; } /* Slightly darker hover for contrast */
 .btn-icon:hover { background: var(--bg-main); color: var(--text-main); }
 
 .td-actions { display: flex; gap: 6px; }
-.empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
 .empty-icon { font-size: 32px; margin-bottom: 12px; color: var(--border); }
+.empty-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; }
+.empty-sub { font-size: 14px; font-weight: 500; color: var(--text-muted); }
+
 .selector-right {
   display: flex;
   align-items: center;
@@ -343,7 +377,7 @@ tbody tr:hover { background: #F1F5F9; } /* Slightly darker hover for contrast */
 .btn-confirm-delete:hover { background: #B91C1C; }
 
 /* Centered Loading Overlay */
-.loading-overlay {
+.loading-state {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(255,255,255,0.7); backdrop-filter: blur(4px);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
